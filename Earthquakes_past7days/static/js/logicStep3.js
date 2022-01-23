@@ -6,7 +6,7 @@
 let streets = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
-    id: 'mapbox/streets-v11',
+    id: 'mapbox/satellite-streets-v11',
     tileSize: 512,
     zoomOffset: -1,
     accessToken: API_KEY
@@ -31,13 +31,13 @@ let baseMaps = {
 
 // This function returns the style data for each of the earthquakes we plot on
 // the map. We pass the magnitude of the earthquake into a function
-// to calculate the radius.
+// to calculate the color & radius.
 
 function sytleInfo(feature){
   return {
     opacity: 1,
     fillOpacity: 1,
-    fillColor: "#ffae42",
+    fillColor: getColor(feature.properties.mag),
     color: "#000000",
     radius: getRadius(feature.properties.mag),
     stroke: true,
@@ -51,6 +51,22 @@ if (magnitude===0){
 return magnitude*4;
 }
 
+//getColor function
+function getColor(magnitude){
+  if (magnitude>4){
+    return "red"
+  }
+  if (magnitude>3){
+    return "orange"
+  }
+  if (magnitude>2){
+    return "yellow"
+  }
+  if (magnitude>1){
+    return "green"
+  }
+  return "pink"
+}
 
 
 // Create the map object with center, zoom level and default layer.
@@ -70,6 +86,10 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
     pointToLayer: function(feature, latlng){
       return L.circleMarker(latlng);
     },
-    style: sytleInfo
+    style: sytleInfo,
+    // popup for each circle marker
+    onEachFeature: function(feature, layer){
+      layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
+    }
 }).addTo(map);
 });
