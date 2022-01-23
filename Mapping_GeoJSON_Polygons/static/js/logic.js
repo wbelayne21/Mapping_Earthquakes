@@ -21,11 +21,11 @@ let baseMaps = {
   'Satellite Streets': satelliteStreets
 };
 
-// // style for the maps 
-// let myStyle = {
-//   color: "#ffffa1",
-//   weight: 1
-//}
+// style for the maps 
+let myStyle = {
+  color: "#ffffa1",
+  weight: 1
+}
 // Create the map object with center, zoom level and default layer.
 let map = L.map('mapid', {
   center: [43.7, -79.3],
@@ -37,10 +37,16 @@ let map = L.map('mapid', {
 L.control.layers(baseMaps).addTo(map);
 
 //Accessing the airport GeoJSON URL
-let torontoHoods = "Mapping_GeoJSON_Polygons/torontoNeighborhoods.json";
+let torontoHoods = "https://raw.githubusercontent.com/wbelayne21/Mapping_Earthquakes/Mapping_GeoJSON_Polygons/Mapping_GeoJSON_Polygons/torontoNeighborhoods.json";
 
 d3.json(torontoHoods).then(function(data){
-  L.geoJSON(data).addTo(map);
+  L.geoJSON(data,{
+    style: myStyle,
+    onEachFeature: function(feature, layer){
+      layer.bindPopup("<h2>" + "Neighborhood: "+ feature.properties.AREA_NAME + "</h2 <hr>");
+
+    }
+  }).addTo(map);
   });
   
 
